@@ -124,6 +124,12 @@ class ViewController: UIViewController {
 
     @IBAction func decimalPressed() {
         //executes statement if current number has no decimal point
+        if wasEqualsJustPressed == true {
+            clearAll()
+        }
+        if isOperandEnabled == true && isDecimalEnabled == false{
+            accumulatorView.text = "0"
+        }
         if isDecimalEnabled == false {
             //prints the decimals on click instead of on calculate
             accumulatorView.text! += "."
@@ -141,15 +147,7 @@ class ViewController: UIViewController {
     @IBAction func plusMinus() {
         
         
-        
-        if wasEqualsJustPressed == true {
-            accumulator.one = accumulator.runningTotal
-            isOperandEnabled = false
-            clearSecondaryDisplay()
-            printToSecondaryDisplay()
-        }
-        if accumulator.one != 0 {
-            
+        if (accumulator.one + Double(accumulator.decimalString)!) != 0 {
             //stores the indecies of the current equation strings negative sign and space -- this is used to toggle the "-" symbol in the string
             let indexOfNegative = accumulator.currentEquationString.rangeOfString("-", options: NSStringCompareOptions.BackwardsSearch)?.startIndex
             let indexOfLastSpace = accumulator.currentEquationString.rangeOfString(" ", options: NSStringCompareOptions.BackwardsSearch)?.startIndex.advancedBy(1)
@@ -158,16 +156,19 @@ class ViewController: UIViewController {
             let startIndex = accumulator.currentEquationString.startIndex
             
             //makes accumulator negative or positive
-            accumulator.one *= -1
-            
+            if accumulator.one != 0 {
+                accumulator.one *= -1
+            } else {
+            accumulator.decimalString = String(Double(accumulator.decimalString)! * -1)
+            }
             //updates the secondary display to toggle the negative symbol depening on the conditions below
-            if indexOfNegative == nil && accumulator.one < 0 && indexOfLastSpace == nil {
+            if indexOfNegative == nil && (accumulator.one + Double(accumulator.decimalString)!) < 0 && indexOfLastSpace == nil {
                 accumulator.currentEquationString.insert("-", atIndex: startIndex)
             } else if indexOfLastSpace == nil {
                 accumulator.currentEquationString.removeAtIndex(startIndex)
-            } else if indexOfLastSpace != nil && accumulator.one > 0 && indexOfNegative != nil {
+            } else if indexOfLastSpace != nil && (accumulator.one + Double(accumulator.decimalString)!) > 0 && indexOfNegative != nil {
                 accumulator.currentEquationString.removeAtIndex(indexOfNegative!)
-            } else if indexOfLastSpace != nil && accumulator.one < 0 {
+            } else if indexOfLastSpace != nil && (accumulator.one + Double(accumulator.decimalString)!) < 0 {
                 accumulator.currentEquationString.insert("-", atIndex: indexOfLastSpace!)
             }
        
@@ -181,13 +182,23 @@ class ViewController: UIViewController {
     
     //converts current number to percent when % key is pressed
     @IBAction func percent() {
-        if percentJustPressed == false && accumulator.currentEquationString != "" && isOperandEnabled == false{
-            accumulator.one /= 100
-            wasEqualsJustPressed = false
-            accumulator.currentEquationString += "% "
-            percentJustPressed = true
-            printToDisplay()
-            printToSecondaryDisplay()
+        if wasEqualsJustPressed == false {
+        
+            if percentJustPressed == false && accumulator.currentEquationString != "" && isOperandEnabled == false{
+                
+                if accumulator.one >= 0 {
+                     accumulator.one = (accumulator.one + Double(accumulator.decimalString)!) / 100
+                } else {
+                     accumulator.one = (accumulator.one - Double(accumulator.decimalString)!) / 100
+                }
+               
+                accumulator.clearDecimalString()
+                wasEqualsJustPressed = false
+                accumulator.currentEquationString += "% "
+                percentJustPressed = true
+                printToDisplay()
+                printToSecondaryDisplay()
+            }
         }
     }
     
@@ -271,6 +282,13 @@ class ViewController: UIViewController {
                 
                 //update main display with the running total
                 accumulatorView.text! = formatDisplayNumber(accumulator.runningTotal)
+                if accumulator.displayNumber == "nan" || accumulator.displayNumber == "+∞"
+                {
+                    accumulatorView.text! = "error"
+                    formulaString.text! = "can't divide by zero"
+                    accumulator.clearAll()
+                    isOperandEnabled = true
+                }
             }
         }
     }
