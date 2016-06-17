@@ -37,6 +37,26 @@ class ViewController: UIViewController {
 
 //this section of code gives the buttons rounded corners -- is there a cleaner way??
     override func viewDidLoad() {
+        
+        // Since these are all the same radius, you can create your own UI component.
+        // When values are used on items, you want to be able to easily change 1 value.
+        // It would really suck if there were 200 elements here and you decided you want a corner radius of 5 instead of 10.
+        // You could create a class as follows:
+        // import UIKit
+        // import QuartzCore
+         
+        // class RoundButton: UIButton
+        // {
+        //     required init?(coder aDecoder: NSCoder)
+        //     {
+        //        super.init(coder: aDecoder)
+        //
+        //        self.layer.cornerRadius = 10
+        //     }
+        // }
+        // 
+        // After you create this class, you can remove all the corner radius code below.
+        // Then in your storyboard file, click on each one of your buttons, and change the class in Indentity Inspector to "RoundButton"
         self.roundButtonOne.layer.cornerRadius = 10
         self.roundButtonTwo.layer.cornerRadius = 10
         self.roundButtonThree.layer.cornerRadius = 10
@@ -74,6 +94,10 @@ class ViewController: UIViewController {
 
     @IBAction func accumulate(sender: AnyObject) {
         
+        // When working with booleans, you don't need to add "== true" or "== false"
+        // The statement can just read "if percentJustPressed {" to check if it is true
+        // or
+        // "if !percentJustPressed {" to check if it is false.
         if percentJustPressed == true {
             clearDisplay()
             accumulator.clearAll()
@@ -382,7 +406,8 @@ class ViewController: UIViewController {
     func clearSecondaryDisplay() {
         formulaString.text! = ""
     }
-    
+    // Functions/method names should be verbs. They are actions.
+    // A more appropriate name could be "executeEqualSwitch(operand: String)
     //updates the value of the running based on operand provided
     func equalSwitch(operand: String) {
         
